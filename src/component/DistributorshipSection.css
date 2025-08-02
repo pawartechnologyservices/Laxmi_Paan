@@ -1,5 +1,4 @@
-/* DistributorshipSection.css - Updated Version without Bulk Order Option */
-
+/* DistributorshipSection.css */
 @import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Montserrat:wght@400;500;600&family=Roboto:wght@300;400;500&display=swap');
 
 /* Laxmi Pan Distributorship Section - Updated Layout */
@@ -551,4 +550,33 @@
   .rewards-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* New styles for user info and auth message */
+.user-info {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #006928;
+  font-weight: 500;
+  font-size: 1.05rem;
+  padding: 0.5rem;
+  background-color: #f0fff4;
+  border-radius: 4px;
+  border-left: 3px solid #71BF44;
+}
+
+.auth-message {
+  background-color: #fff9e6;
+  border-left: 4px solid #ffc107;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 4px;
+  text-align: center;
+  color: #333;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.auth-message p {
+  margin: 0;
 }

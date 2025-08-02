@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { FaTimes, FaLeaf, FaEnvelope, FaPhone, FaFacebook, FaWhatsapp, FaInstagram, FaUser, FaPaperPlane } from 'react-icons/fa';
 import './FloatingContactButton.css';
+import { database } from '../firebase'; // Make sure this path is correct
+import { ref, push } from "firebase/database";
 
 const FloatingContactButton = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,9 +12,14 @@ const FloatingContactButton = () => {
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState({ success: false, message: '' });
 
   const toggleContactForm = () => {
     setIsOpen(!isOpen);
+    // Clear status when closing
+    if (isOpen) {
+      setSubmitStatus({ success: false, message: '' });
+    }
   };
 
   const handleInputChange = (e) => {
@@ -23,18 +30,63 @@ const FloatingContactButton = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const sendWhatsAppMessage = (data) => {
+    // Format phone number (remove any non-digit characters)
+    const phoneNumber = '919359436769'.replace(/\D/g, '');
+    
+    // Create message content
+    const messageContent = encodeURIComponent(
+      `New Message from Floating Contact Form:\n\n` +
+      `*Name:* ${data.name}\n` +
+      `*Email:* ${data.email}\n` +
+      `*Message:*\n${data.message}\n\n` +
+      `_Sent from Laxmi Paan Website_`
+    );
+    
+    // Create WhatsApp URL
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${messageContent}`;
+    
+    // Open WhatsApp in new tab
+    window.open(whatsappUrl, '_blank');
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
-    setTimeout(() => {
-      console.log('Form submitted:', formData);
-      alert('Thank you for your message! We will get back to you soon.');
+    try {
+      // Create reference to 'floatingContactMessages' path
+      const messagesRef = ref(database, 'floatingContactMessages');
+      
+      // Push new message with timestamp
+      await push(messagesRef, {
+        ...formData,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Send WhatsApp message
+      sendWhatsAppMessage(formData);
+      
+      // Reset form and show success
       setFormData({ name: '', email: '', message: '' });
-      setIsOpen(false);
+      setSubmitStatus({
+        success: true,
+        message: 'Message sent successfully!'
+      });
+      
+      // Close form after 3 seconds
+      setTimeout(() => {
+        setIsOpen(false);
+      }, 3000);
+    } catch (error) {
+      console.error("Error submitting form: ", error);
+      setSubmitStatus({
+        success: false,
+        message: 'Failed to send message. Please try again.'
+      });
+    } finally {
       setIsSubmitting(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -50,6 +102,12 @@ const FloatingContactButton = () => {
       {isOpen && (
         <div className="contact-panel">
           <h3>Get In Touch</h3>
+          
+          {submitStatus.message && (
+            <div className={`floating-status ${submitStatus.success ? 'success' : 'error'}`}>
+              {submitStatus.message}
+            </div>
+          )}
           
           <form onSubmit={handleSubmit}>
             <div className="form-group">

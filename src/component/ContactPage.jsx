@@ -1,10 +1,83 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './ContactPage.css';
+import { database } from '../firebase';
+import { ref, push } from "firebase/database";
 
 const ContactPage = () => {
-  const handleSubmit = (e) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    message: ''
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState({ success: false, message: '' });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const sendWhatsAppMessage = (data) => {
+    // Format phone number (remove any non-digit characters)
+    const phoneNumber = '919673961161'.replace(/\D/g, '');
+    
+    // Create message content
+    const messageContent = encodeURIComponent(
+      `New Contact Form Submission:\n\n` +
+      `*Name:* ${data.name}\n` +
+      `*Email:* ${data.email}\n` +
+      `*Phone:* ${data.phone || 'Not provided'}\n` +
+      `*Message:*\n${data.message}\n\n` +
+      `_Sent from Laxmi Paan Website_`
+    );
+    
+    // Create WhatsApp URL
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${messageContent}`;
+    
+    // Open WhatsApp in new tab
+    window.open(whatsappUrl, '_blank');
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert('Form submitted!');
+    setSubmitting(true);
+    
+    try {
+      // Create reference to 'contactMessages' path
+      const messagesRef = ref(database, 'contactMessages');
+      
+      // Push new message with timestamp
+      await push(messagesRef, {
+        ...formData,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Send WhatsApp message
+      sendWhatsAppMessage(formData);
+      
+      // Reset form and show success
+      setFormData({ name: '', email: '', phone: '', message: '' });
+      setSubmitStatus({
+        success: true,
+        message: 'Message sent successfully! We will contact you soon.'
+      });
+    } catch (error) {
+      console.error("Error submitting form: ", error);
+      setSubmitStatus({
+        success: false,
+        message: 'Failed to send message. Please try again later.'
+      });
+    } finally {
+      setSubmitting(false);
+      // Clear status message after 5 seconds
+      setTimeout(() => {
+        setSubmitStatus({ success: false, message: '' });
+      }, 5000);
+    }
   };
 
   return (
@@ -12,10 +85,16 @@ const ContactPage = () => {
       {/* Banner Section */}
       <div className="contact-banner">
         <div className="banner-content">
-          {/* <h1>Contact Us</h1>
-          <p>We'd love to hear from you</p> */}
+          {/* Optional: Add banner content if needed */}
         </div>
       </div>
+
+      {/* Status Message */}
+      {submitStatus.message && (
+        <div className={`submit-status ${submitStatus.success ? 'success' : 'error'}`}>
+          {submitStatus.message}
+        </div>
+      )}
 
       {/* Contact Form and Map Section */}
       <div className="contact-content-wrapper">
@@ -33,21 +112,54 @@ const ContactPage = () => {
               <h3>Send us a message</h3>
               <div className="form-group">
                 <label htmlFor="name">Name</label>
-                <input type="text" id="name" name="name" required />
+                <input 
+                  type="text" 
+                  id="name" 
+                  name="name" 
+                  value={formData.name}
+                  onChange={handleChange}
+                  required 
+                />
               </div>
               <div className="form-group">
                 <label htmlFor="email">Email</label>
-                <input type="email" id="email" name="email" required />
+                <input 
+                  type="email" 
+                  id="email" 
+                  name="email" 
+                  value={formData.email}
+                  onChange={handleChange}
+                  required 
+                />
               </div>
               <div className="form-group">
                 <label htmlFor="phone">Phone</label>
-                <input type="tel" id="phone" name="phone" />
+                <input 
+                  type="tel" 
+                  id="phone" 
+                  name="phone" 
+                  value={formData.phone}
+                  onChange={handleChange}
+                />
               </div>
               <div className="form-group">
                 <label htmlFor="message">Message</label>
-                <textarea id="message" name="message" rows="5" required></textarea>
+                <textarea 
+                  id="message" 
+                  name="message" 
+                  rows="5" 
+                  value={formData.message}
+                  onChange={handleChange}
+                  required
+                ></textarea>
               </div>
-              <button type="submit" className="submit-btn">Send Message</button>
+              <button 
+                type="submit" 
+                className="submit-btn"
+                disabled={submitting}
+              >
+                {submitting ? 'Sending...' : 'Send Message'}
+              </button>
             </form>
           </div>
 

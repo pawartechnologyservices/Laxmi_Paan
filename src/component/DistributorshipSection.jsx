@@ -1,9 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GiProfit, GiLeafSwirl, GiPresent, GiShop, GiCash } from 'react-icons/gi';
 import { MdLocalShipping, MdSupportAgent, MdStars } from 'react-icons/md';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import './DistributorshipSection.css';
+import { database, auth } from '../firebase';
+import { ref, set, push } from "firebase/database";
+import { 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  signOut, 
+  onAuthStateChanged 
+} from "firebase/auth";
+import Popup from './Popup';
 
 const DistributorshipSection = () => {
   const [formData, setFormData] = useState({
@@ -24,7 +33,28 @@ const DistributorshipSection = () => {
     confirmPassword: ''
   });
 
+  const [currentUser, setCurrentUser] = useState(null);
   const [passwordError, setPasswordError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [popup, setPopup] = useState({
+    show: false,
+    type: '',
+    message: ''
+  });
+
+  // Track authentication state
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentUser(user);
+        setAuthMode('authenticated');
+      } else {
+        setCurrentUser(null);
+        setAuthMode('signin');
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Password validation function
   const validatePassword = (password) => {
@@ -111,72 +141,203 @@ const DistributorshipSection = () => {
     }));
   };
 
-  const handleSignUp = (e) => {
+  const showPopup = (type, message) => {
+    setPopup({
+      show: true,
+      type,
+      message
+    });
+    
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+      setPopup({
+        show: false,
+        type: '',
+        message: ''
+      });
+    }, 5000);
+  };
+
+  const closePopup = () => {
+    setPopup({
+      show: false,
+      type: '',
+      message: ''
+    });
+  };
+
+  const sendWhatsAppNotification = (data) => {
+    // Format phone number (remove any non-digit characters)
+    const phoneNumber = '919359436769'.replace(/\D/g, '');
+    
+    // Create message content
+    const messageContent = encodeURIComponent(
+      `New Distributorship Application:\n\n` +
+      `*Name:* ${data.fullName}\n` +
+      `*Phone:* ${data.phoneNumber}\n` +
+      `*Email:* ${data.email || 'Not provided'}\n` +
+      `*Business:* ${data.businessName}\n` +
+      `*Location:* ${data.cityState}\n` +
+      `*Business Type:* ${data.businessType}\n` +
+      `*Reason:*\n${data.interestReason}\n\n` +
+      `_Sent from Laxmi Paan Website_`
+    );
+    
+    // Create WhatsApp URL
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${messageContent}`;
+    
+    // Open WhatsApp in new tab
+    window.open(whatsappUrl, '_blank');
+  };
+
+  const handleSignUp = async (e) => {
     e.preventDefault();
     
     // Validate passwords match
     if (authData.password !== authData.confirmPassword) {
-      alert("Passwords don't match!");
+      showPopup('error', "Passwords don't match!");
       return;
     }
     
     // Check password requirements
     if (passwordError) {
-      alert(passwordError);
+      showPopup('error', passwordError);
       return;
     }
     
-    // In a real app, you would send this to your backend
-    alert('Account created successfully! Please sign in.');
-    setAuthMode('signin');
-    setAuthData({
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: ''
-    });
+    try {
+      // Create user with Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(
+        auth, 
+        authData.email, 
+        authData.password
+      );
+      
+      // Store additional user info in Realtime Database
+      const userInfoRef = ref(database, `users/${userCredential.user.uid}/info`);
+      await set(userInfoRef, {
+        name: authData.name,
+        email: authData.email,
+        createdAt: new Date().toISOString()
+      });
+      
+      // Update UI state
+      setAuthMode('authenticated');
+      setAuthData({
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: ''
+      });
+      
+      showPopup('success', 'Account created successfully!');
+    } catch (error) {
+      console.error("Sign up error: ", error);
+      
+      // Custom error messages for Firebase authentication errors
+      let errorMessage = 'Failed to create account. Please try again.';
+      
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = 'Email already in use. Please sign in or use a different email.';
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = 'Password is too weak. Please use a stronger password.';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'Invalid email address. Please enter a valid email.';
+      }
+      
+      showPopup('error', errorMessage);
+    }
   };
 
-  const handleSignIn = (e) => {
+  const handleSignIn = async (e) => {
     e.preventDefault();
+    
     if (!authData.email || !authData.password) {
-      alert('Please enter both email and password');
+      showPopup('error', 'Please enter both email and password');
       return;
     }
     
-    // Check password requirements
-    if (passwordError) {
-      alert(passwordError);
-      return;
+    try {
+      await signInWithEmailAndPassword(
+        auth, 
+        authData.email, 
+        authData.password
+      );
+      showPopup('success', 'Sign in successful!');
+    } catch (error) {
+      console.error("Sign in error: ", error);
+      
+      // Custom error messages for Firebase authentication errors
+      let errorMessage = 'Failed to sign in. Please try again.';
+      
+      if (error.code === 'auth/user-not-found') {
+        errorMessage = 'No account found. Please create an account first.';
+      } else if (error.code === 'auth/invalid-credential') {
+        errorMessage = 'Invalid email or password. Please check your credentials.';
+      } else if (error.code === 'auth/wrong-password') {
+        errorMessage = 'Incorrect password. Please try again.';
+      } else if (error.code === 'auth/too-many-requests') {
+        errorMessage = 'Too many failed attempts. Account temporarily locked. Please try again later.';
+      } else {
+        errorMessage = error.message || 'Failed to sign in. Please try again.';
+      }
+      
+      showPopup('error', errorMessage);
     }
-    
-    setAuthMode('authenticated');
-    alert('Sign in successful!');
   };
 
-  const handleSignOut = () => {
-    setAuthMode('signin');
-    setAuthData({
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: ''
-    });
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      showPopup('success', 'Signed out successfully!');
+    } catch (error) {
+      console.error("Sign out error: ", error);
+      showPopup('error', 'Failed to sign out. Please try again.');
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    alert('Thank you for your application! We will contact you soon.');
-    setFormData({
-      fullName: '',
-      phoneNumber: '',
-      email: '',
-      businessName: '',
-      cityState: '',
-      businessType: '',
-      interestReason: '',
-    });
+    
+    if (!currentUser) {
+      showPopup('error', 'You need to be signed in to submit an application. Please create an account first.');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      // Create reference to user's distributorship applications
+      const applicationsRef = ref(database, `users/${currentUser.uid}/distributorshipApplications`);
+      
+      // Push new application with timestamp
+      const newApplicationRef = push(applicationsRef);
+      await set(newApplicationRef, {
+        ...formData,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Send WhatsApp notification
+      sendWhatsAppNotification(formData);
+      
+      // Reset form and show success
+      setFormData({
+        fullName: '',
+        phoneNumber: '',
+        email: '',
+        businessName: '',
+        cityState: '',
+        businessType: '',
+        interestReason: '',
+      });
+      
+      showPopup('success', 'Application submitted successfully! We will contact you soon.');
+    } catch (error) {
+      console.error("Error submitting application: ", error);
+      showPopup('error', error.message || 'Failed to submit application. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderAuthForm = () => {
@@ -268,6 +429,9 @@ const DistributorshipSection = () => {
       return (
         <>
           <h3>Sign In to Apply</h3>
+          <div className="auth-message">
+            <p>You need to create an account or sign in to access the distributorship application form.</p>
+          </div>
           <form onSubmit={handleSignIn}>
             <div className="form-group">
               <label htmlFor="email">Email Address*</label>
@@ -320,6 +484,12 @@ const DistributorshipSection = () => {
       return (
         <>
           <h3>Apply for Distributorship</h3>
+          {currentUser && (
+            <div className="user-info">
+              Signed in as: {currentUser.email}
+            </div>
+          )}
+          
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label htmlFor="fullName">Full Name*</label>
@@ -330,6 +500,7 @@ const DistributorshipSection = () => {
                 value={formData.fullName}
                 onChange={handleInputChange}
                 required
+                disabled={isSubmitting}
               />
             </div>
 
@@ -342,6 +513,7 @@ const DistributorshipSection = () => {
                 value={formData.phoneNumber}
                 onChange={handleInputChange}
                 required
+                disabled={isSubmitting}
               />
             </div>
 
@@ -353,6 +525,7 @@ const DistributorshipSection = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
+                disabled={isSubmitting}
               />
             </div>
 
@@ -365,6 +538,7 @@ const DistributorshipSection = () => {
                 value={formData.businessName}
                 onChange={handleInputChange}
                 required
+                disabled={isSubmitting}
               />
             </div>
 
@@ -377,6 +551,7 @@ const DistributorshipSection = () => {
                 value={formData.cityState}
                 onChange={handleInputChange}
                 required
+                disabled={isSubmitting}
               />
             </div>
 
@@ -388,6 +563,7 @@ const DistributorshipSection = () => {
                 value={formData.businessType}
                 onChange={handleInputChange}
                 required
+                disabled={isSubmitting}
               >
                 <option value="">Select business type</option>
                 <option value="Retail Shop">Retail Shop</option>
@@ -407,6 +583,7 @@ const DistributorshipSection = () => {
                 value={formData.interestReason}
                 onChange={handleInputChange}
                 required
+                disabled={isSubmitting}
               />
             </div>
              <p className="bulk-order-note">
@@ -419,8 +596,9 @@ const DistributorshipSection = () => {
               className="submit-btns"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              disabled={isSubmitting}
             >
-              Apply Now
+              {isSubmitting ? 'Submitting...' : 'Apply Now'}
             </motion.button>
 
             <div className="auth-switch">
@@ -440,6 +618,15 @@ const DistributorshipSection = () => {
 
   return (
     <section id="distributorship" className="distributorship-section">
+      {/* Popup Component */}
+      {popup.show && (
+        <Popup 
+          type={popup.type} 
+          message={popup.message} 
+          onClose={closePopup} 
+        />
+      )}
+
       <div className="container">
         <motion.div 
           className="header-container"
