@@ -1,0 +1,221 @@
+body {
+  overflow-x: hidden;
+  /* Disable vertical scrolling */
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+/* New Class Names to Avoid Conflicts */
+.paan-banner-slider {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.paan-banner-background {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+.paan-banner-overlay {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 5%;
+  box-sizing: border-box;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.paan-product-container {
+  flex: 0 0 45%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-right: 5%;
+}
+
+.paan-product-image {
+  max-height: 80vh; /* Increased from 80vh */
+  max-width: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 25px rgba(0, 0, 0, 0.8));
+  animation: paan-float 3s ease-in-out infinite;
+}
+
+/* Update the text container positioning */
+.paan-text-content {
+  flex: 0 0 45%;
+  color: white;
+  margin-top: -10%;
+  position: relative;
+  z-index: 3;
+}
+
+.paan-main-heading {
+  font-family: 'BlackChancery', serif;
+  font-size: 5rem;
+  color: #B8E31E;
+  margin-bottom: 4rem;
+  margin-top: -5%;
+  text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.9);
+  line-height: 1;
+}
+
+.paan-sub-heading {
+  font-family: 'BlackChancery', serif;
+  font-size: 3.5rem !important;
+  color: #FFFFFF;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+  line-height: 1.2;
+  margin-top: -5%;
+}
+
+/* Animations with Unique Names */
+@keyframes paan-fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes paan-float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
+}
+
+.paan-animated-text {
+  animation: paan-fadeIn 1s ease-out forwards;
+}
+
+/* Updated Responsive Design */
+@media (max-width: 1600px) {
+  .paan-main-heading {
+    font-size: 4.5rem;
+  }
+  .paan-sub-heading {
+    font-size: 3rem;
+  }
+}
+
+@media (max-width: 1200px) {
+  .paan-main-heading {
+    font-size: 4rem;
+  }
+  .paan-sub-heading {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .paan-banner-overlay {
+    padding: 0 5%;
+  }
+  .paan-main-heading {
+    font-size: 3.5rem;
+  }
+  .paan-product-image {
+    max-height: 70vh;
+  }
+}
+
+/* Tablet View Adjustments (768px-992px) */
+@media (max-width: 992px) and (min-width: 768px) {
+  .paan-banner-overlay {
+    flex-direction: column-reverse;
+    justify-content: center;
+    padding-top: 5%;
+  }
+  .paan-product-container {
+    flex: 0 0 auto;
+    padding-right: 0;
+    margin-top: 2rem;
+  }
+  .paan-product-image {
+    max-height: 60vh; /* Increased from 50vh */
+  }
+  .paan-text-content {
+    flex: 0 0 auto;
+    margin-top: 0;
+  }
+  .paan-main-heading {
+    font-size: 3.2rem; /* Increased from 2.8rem */
+    margin-bottom: 2rem;
+  }
+  .paan-sub-heading {
+    font-size: 2.2rem !important; /* Increased from 1.6rem */
+  }
+}
+
+/* Mobile View Adjustments */
+@media (max-width: 768px) {
+  .paan-banner-overlay {
+    flex-direction: column-reverse;
+    justify-content: flex-start;
+    text-align: center;
+    padding-top: 10%;
+  }
+  .paan-product-container {
+    flex: 0 0 auto;
+    padding-right: 0;
+    margin-bottom: 1.5rem;
+  }
+  .paan-text-content {
+    flex: 0 0 auto;
+    margin-bottom: 1.5rem;
+  }
+  .paan-main-heading {
+    font-size: 3rem; /* Increased from 2.8rem */
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+  }
+  .paan-sub-heading {
+    font-size: 2rem !important; /* Increased from 1.6rem */
+    margin-top: 0;
+  }
+  .paan-product-image {
+    max-height: 55vh; /* Increased from 45vh */
+  }
+}
+
+@media (max-width: 576px) {
+  .paan-main-heading {
+    font-size: 2.6rem; /* Increased from 2.4rem */
+  }
+  .paan-sub-heading {
+    font-size: 1.8rem !important; /* Increased from 1.4rem */
+  }
+  .paan-product-image {
+    max-height: 50vh; /* Increased from 40vh */
+  }
+}
+
+/* For very small devices */
+@media (max-width: 400px) {
+  .paan-main-heading {
+    font-size: 2.4rem; /* Increased from 2.2rem */
+  }
+  .paan-sub-heading {
+    font-size: 1.6rem !important; /* Increased from 1.3rem */
+  }
+  .paan-banner-overlay {
+    padding-top: 5%;
+  }
+  .paan-product-image {
+    max-height: 45vh; /* Increased from original */
+  }
+  
+}

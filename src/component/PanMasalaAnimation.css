@@ -1,0 +1,307 @@
+/* Vertical navbar variables */
+:root {
+  --navbar-collapsed-width: 0px; /* Set to 0 since we're making full-width */
+  --navbar-expanded-width: 0px;  /* Set to 0 since we're making full-width */
+  --banner-height-desktop: 450px;
+  --banner-height-tablet: 280px;
+  --banner-height-mobile: 180px;
+  --overlay-img-width-desktop: 300px;
+  --overlay-img-width-tablet: 90px;
+  --overlay-img-width-mobile: 70px;
+}
+/* Main container - no gaps */
+.horizontal-banners-container {
+  width: 100vw;
+  margin-left: 0;
+  padding: 0;
+  background-color: #f9f9f9;
+  box-sizing: border-box;
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: hidden; /* Disable vertical scrolling */
+}
+
+/* Expanded navbar state */
+/* .navbar.expanded ~ .horizontal-banners-container {
+  width: calc(100vw - var(--navbar-expanded-width));
+  margin-left: var(--navbar-expanded-width);
+} */
+
+/* Banner items - no gaps */
+.banner-item {
+  position: relative;
+  height: var(--banner-height-desktop);
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Banner background */
+.banner-bg {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+/* Overlay content - default (left image) */
+.overlay-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
+  background-color: rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
+}
+
+/* Right-aligned images for banners 2 and 4 */
+.banner-item:nth-child(2) .overlay-content,
+.banner-item:nth-child(4) .overlay-content {
+  flex-direction: row-reverse;
+}
+
+/* Medium overlay images */
+.overlay-img {
+  height: 75%;
+  width: var(--overlay-img-width-desktop);
+  object-fit: contain;
+  margin-right: 25px;
+  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
+}
+
+/* Adjust margins for right-aligned images */
+.banner-item:nth-child(2) .overlay-img,
+.banner-item:nth-child(4) .overlay-img {
+  margin-right: 0;
+  margin-left: 25px;
+}
+
+/* Text content - modified to only show subtitle */
+.text-content {
+  margin-top: 10px;
+  color: white;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+  font-weight: 700;
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  text-align: center;  /* ✅ Center text below image */
+
+  
+}
+
+
+.right-align .text-content {
+  text-align: right;
+  
+}
+
+/* Hide the title */
+.text-content h3 {
+  display: none;
+}
+
+/* Style subtitle like a title */
+.text-content p {
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  margin: 15px 0 0 0;
+  font-weight: 700;
+  font-style: normal;
+  letter-spacing: 0.5px;
+
+}
+
+.image-text-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center; /* ✅ Center content under image */
+  text-align: center;  /* ✅ Center the text */
+}
+
+
+/* Right-aligned image and text */
+.right-align .image-text-wrapper {
+  align-items: center;
+}
+
+/* Slide-in animation styles */
+.slide-img {
+  position: absolute;
+  height: 15%;
+  width: auto;
+  max-width: 200px;
+  object-fit: contain;
+  z-index: 1;
+  opacity: 0;
+  transition: all 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+  filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.5));
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Initial positions */
+.slide-img.left {
+  left: -150px;
+}
+
+.slide-img.right {
+  right: -150px;
+}
+
+/* Animation when scrolling DOWN */
+.slide-img.left.animate-down {
+  opacity: 0.9;
+  left: 50%;
+}
+
+.slide-img.right.animate-down {
+  opacity: 0.9;
+  right: 50%;
+}
+
+/* Animation when scrolling UP */
+.slide-img.left.animate-up {
+ 
+  left: 15%; /* Stops a bit earlier when scrolling up */
+}
+
+.slide-img.right.animate-up {
+ 
+  right: 15%; /* Stops a bit earlier when scrolling up */
+}
+
+/* Mockup styles */
+.mockup-container {
+  width: 100%;
+  padding: 100px 20px;
+  background-color: #080014;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mockup-image {
+  max-width: 45%;
+  height: auto;
+  object-fit: contain;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  margin-bottom: -70px;
+  margin-top: -90px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .banner-item {
+    height: var(--banner-height-tablet);  
+  }
+  
+  .overlay-img {
+    width: var(--overlay-img-width-tablet);
+    margin-right: 20px;
+    height: 70%;
+  }
+  
+  .banner-item:nth-child(2) .overlay-img,
+  .banner-item:nth-child(4) .overlay-img {
+    margin-left: 20px;
+    margin-right: 0;
+  }
+  
+  .text-content p {
+    font-size: clamp(1.3rem, 2.2vw, 1.8rem);
+    margin-top: 12px;
+  }
+  
+  .overlay-content {
+    padding: 0 30px;
+  }
+
+  .mockup-container {
+    padding: 30px 0;
+  }
+  .mockup-image {
+    max-width: 60%;
+    margin-bottom: -40px;
+    margin-top: -50px;
+  }
+}
+
+@media (max-width: 768px) {
+  .horizontal-banners-container {
+    width: 100vw;
+    margin-left: 0;
+  }
+  
+  .navbar.expanded ~ .horizontal-banners-container {
+    width: 100vw;
+    margin-left: 0;
+  }
+  
+  .banner-item {
+    height: var(--banner-height-mobile);
+  }
+  
+  .overlay-img {
+    width: var(--overlay-img-width-mobile);
+    margin-right: 15px;
+    height: 65%;
+  }
+  
+  .banner-item:nth-child(2) .overlay-img,
+  .banner-item:nth-child(4) .overlay-img {
+    margin-left: 15px;
+    margin-right: 0;
+  }
+  
+  .text-content p {
+    font-size: clamp(1.1rem, 1.8vw, 1.4rem);
+    margin-top: 8px;
+  }
+  
+  .overlay-content {
+    padding: 0 20px;
+  }
+
+  .mockup-container {
+    padding: 20px 0;
+  }
+  .mockup-image {
+    max-width: 80%;
+    margin-bottom: -20px;
+    margin-top: -30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .overlay-content {
+    padding: 0 15px;
+  }
+  
+  .overlay-img {
+    margin-right: 12px;
+  }
+  
+  .banner-item:nth-child(2) .overlay-img,
+  .banner-item:nth-child(4) .overlay-img {
+    margin-left: 12px;
+    margin-right: 0;
+  }
+  
+  .text-content p {
+    font-size: 1.1rem;
+    margin-top: 6px;
+  }
+  
+  .mockup-container {
+    padding: 15px 0;
+  }
+  .mockup-image {
+    max-width: 90%;
+    margin-bottom: -10px;
+    margin-top: -20px;
+  }
+}

@@ -1,0 +1,398 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Montserrat:wght@400;500;600&family=Roboto:wght@300;400;500&display=swap');
+
+/* Announcement Bar */
+.announcement-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1001;
+  background-color: #006928;
+  color: white;
+  text-align: center;
+  padding: 10px 0;
+  font-size: 14px;
+  border-bottom: 1px solid #e0e0e0;
+  transition: transform 0.3s ease;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.announcement-bar.hidden {
+  transform: translateY(-100%);
+}
+
+.announcement-text {
+  animation: fadeInOut 2.5s ease-in-out infinite;
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; }
+  20%, 80% { opacity: 1; }
+}
+
+/* Navbar Styles */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1002;
+  background-color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 30px;
+  height: 80px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Logo */
+.navbar-logo {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  margin-left: 40px;
+}
+
+.navbar-logo img {
+  max-height: 140px;
+  height: auto;
+  width: auto;
+  max-width: 100%;
+    margin-bottom: -10px;
+
+}
+
+/* Navigation tabs */
+.nav-tabs {
+  display: flex;
+  gap: 15px;
+  position: relative;
+}
+
+.nav-tab {
+  background: none;
+  border: none;
+  font-size: 16.5px;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  padding: 10px 15px;
+  position: relative;
+  transition: color 0.3s;
+  text-transform: uppercase;
+  text-decoration: none;
+  font-family: 'Lora', serif;
+  left: -70px;
+  overflow: hidden;
+}
+
+.nav-tab:hover {
+  color: #000;
+}
+
+/* Snake Border Animation */
+.nav-tab::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 2px solid transparent;
+  box-sizing: border-box;
+  transition: all 0.5s;
+}
+
+.nav-tab:hover::before {
+  border-color: #006928;
+  animation: drawBorder 0.8s linear forwards;
+}
+
+@keyframes drawBorder {
+  0% {
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+  }
+  25% {
+    clip-path: polygon(0 0, 100% 0, 100% 0, 0 100%);
+  }
+  50% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+  75% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+  100% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+}
+
+/* Dropdown Menu */
+.nav-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.nav-dropdown .dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #fff;
+  min-width: 200px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  top: 100%;
+  margin-left: -30px;
+  left: 0;
+}
+
+.nav-dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown-item {
+  color: #333;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  font-size: 14px;
+  text-transform: uppercase;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f8f8;
+}
+
+.dropdown-icon {
+  margin-left: 5px;
+  font-size: 12px;
+}
+
+/* Hamburger menu */
+.hamburger {
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* Mobile Dropdown Menu */
+.mobile-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: #fff;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  text-align: center;
+}
+
+.mobile-dropdown-menu.open {
+  max-height: 500px;
+}
+
+.mobile-dropdown-content {
+  padding: 20px;
+}
+
+.mobile-dropdown-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.mobile-dropdown-link {
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+  padding: 12px 0;
+  text-transform: uppercase;
+  display: block;
+  border-bottom: 1px solid #f0f0f0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Mobile Link Animation */
+.mobile-dropdown-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 1px solid transparent;
+  box-sizing: border-box;
+  transition: all 0.5s;
+}
+
+.mobile-dropdown-link:hover::before {
+  border-color: #006928;
+  animation: drawBorderMobile 0.6s linear forwards;
+}
+
+@keyframes drawBorderMobile {
+  0% {
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+  }
+  25% {
+    clip-path: polygon(0 0, 100% 0, 100% 0, 0 100%);
+  }
+  50% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+  75% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+  100% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+}
+
+/* Prevent scrolling when menu is open */
+.no-scroll {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
+/* Existing CSS remains the same until the media queries */
+
+/* Responsive styles */
+@media (max-width: 1199px) {
+  /* Tablet landscape adjustments */
+  .navbar-logo img {
+    max-height: 120px;
+  }
+  
+  .nav-tabs {
+    gap: 15px;
+  }
+  
+  .nav-tab {
+    font-size: 15px;
+    padding: 8px 12px;
+    left: -40px;
+  }
+}
+
+@media (max-width: 992px) {
+  /* Tablet portrait adjustments */
+  .navbar {
+    padding: 0 25px;
+  }
+  
+  .navbar-logo img {
+    max-height: 110px;
+  }
+  
+  .nav-tabs {
+    gap: 12px;
+    left: 30px;
+  }
+  
+  .nav-tab {
+    font-size: 14px;
+    padding: 8px 10px;
+    left: -30px;
+  }
+  
+  .dropdown-content {
+    min-width: 180px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Small tablet to mobile transition */
+  .nav-tabs {
+    display: none;
+  }
+  
+  .navbar {
+    padding: 0 20px;
+    height: 70px;
+     justify-content: space-between;
+  }
+  
+  .navbar-logo {
+    margin-left: 0;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+      height: auto; 
+  }
+  
+  .navbar-logo img {
+    max-height: 100px !important; /* Increased from 90px */
+    height: auto;
+    width: auto;
+    max-width: 180px; /* Added to prevent logo from becoming too wide */
+    margin-bottom: -10px;
+  }
+  
+  .navbar-icons {
+    margin-left: auto;
+  }
+  
+  .mobile-dropdown-menu {
+    top: 70px; /* Matches navbar height */
+  }
+}
+
+@media (max-width: 576px) {
+  /* Mobile phones */
+  .navbar {
+    height: 65px;
+    padding: 0 15px;
+  }
+  
+  .navbar-logo img {
+    max-height: 90px; /* Increased from 80px */
+    max-width: 160px;
+  }
+  
+  .hamburger {
+    font-size: 18px;
+  }
+  
+  .announcement-bar {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+  
+  .mobile-dropdown-menu {
+    top: 65px; /* Matches navbar height */
+  }
+}
+
+@media (max-width: 400px) {
+  /* Very small phones */
+  .navbar-logo img {
+    max-height: 80px; /* Increased from 70px */
+    max-width: 140px;
+  }
+  
+  .navbar {
+    height: 60px;
+  }
+  
+  .mobile-dropdown-menu {
+    top: 60px; /* Matches navbar height */
+  }
+}
+
+/* Mobile/Desktop visibility - keep this at the end */
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-only {
+    display: block;
+  }
+  
+  .desktop-only {
+    display: none;
+  }
+}
